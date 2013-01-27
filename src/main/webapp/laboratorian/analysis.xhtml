@@ -1,0 +1,135 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Лаборатория</title>
+		<style type="text/css">
+                        .ui-datatable table {
+                                width:100%;
+                        }
+                        .label {
+                                width:20%;
+                                padding:4px;
+                        }
+                        .value {
+                                width:80%;
+                                padding:4px;
+                        }
+                        .grid {
+                                width:100%;
+                        }
+                        .ui-widget, .ui-widget .ui-widget {
+                                font-size:12px !important;
+                        }
+                </style>
+	</h:head>
+	<h:body>
+		<h:form id="form">
+			<p:growl id="growl" showDetail="true" />
+			<p:breadCrumb>  
+			    <p:menuitem value="Home" url="#" />  
+			    <p:menuitem value="Выйти из системы" url="/j_spring_security_logout" />  
+			</p:breadCrumb> 
+			
+            <p:panel header="Пользователь">  
+            	<h:panelGrid id="user" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="user_surname" value="Фамилия: " />
+					<p:inputText id="user_surname" value="#{analysisBean.doctor.surname}" readonly="true"/>
+					
+					<h:outputLabel for="user_name" value="Имя: " />
+					<p:inputText id="user_name" value="#{analysisBean.doctor.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_patronymic" value="Отчество: " />
+					<p:inputText id="user_patronymic" value="#{analysisBean.doctor.patronymic}" readonly="true"/>
+					
+					<h:outputLabel for="user_specialty" value="Специальность: " />
+					<p:inputText id="user_specialty" value="#{analysisBean.doctor.specialty.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_role" value="Должность: " />
+					<p:inputText id="user_role" value="#{analysisBean.doctor.role_name}" readonly="true"/>
+					
+            	</h:panelGrid>
+            </p:panel>
+             
+            <p:panel header="Анализы">              
+			<p:dataTable id="analysisTable" 
+						 var="analysis" 
+						 value="#{analysisBean.analysis}" 
+						 widgetVar="analysis_Table" 
+						 emptyMessage="В таблице нет записей с таких критерием поиска" 
+						 filteredValue="#{analysisBean.filteredAnalysis}"
+						 rowKey="#{analysis.id}"
+						 rows="6"
+						 selection="#{analysisBean.selectedAnalysis}"  selectionMode="single">
+						 
+				<p:ajax event="rowSelect" update=":form:detail"/>
+				
+				<f:facet name="header">
+					<p:outputPanel>
+						<h:outputText value="Поиск по всем полям: " />
+						<p:inputText id="globalFilter" onkeyup="patientsTable.filter()" style="width:150px" />
+					</p:outputPanel>
+				</f:facet>
+				
+				<p:column id="surnameColumn" filterBy="#{analysis.visit.patient.surname}" 
+						  headerText="Фамилия">
+					<h:outputText value="#{analysis.visit.patient.surname}" />
+				</p:column>
+				
+				<p:column id="nameColumn" filterBy="#{analysis.visit.patient.name}" 
+						  headerText="Имя">
+					<h:outputText value="#{analysis.visit.patient.name}" />
+				</p:column>
+				
+				<p:column id="patronymicColumn" filterBy="#{analysis.visit.patient.patronymic}" 
+						  headerText="Отчество">
+					<h:outputText value="#{analysis.visit.patient.patronymic}" />
+				</p:column>
+	
+				<p:column style="width:4%">  
+					<p:commandButton 
+								id="noteButton" 
+								icon="ui-icon-check"
+								value="Отметить"
+								update=":form:detail" 
+								oncomplete="editDialog.show()">  
+						<f:setPropertyActionListener value="#{analysis}" target="#{analysisBean.selectedAnalysis}" />  
+					</p:commandButton>  
+				</p:column>				
+				
+				<f:facet name="footer">  
+				</f:facet>
+				  
+			</p:dataTable>
+			</p:panel>
+	     
+			<p:dialog header="Анализ крови" modal="true" widgetVar="editDialog" resizable="false">
+				<h:panelGrid id="detail" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="wbc" value="Лейкоциты: " />
+					<p:inputText id="wbc" value="#{analysisBean.selectedAnalysis.wbc}"/>
+					
+					<h:outputLabel for="rbc" value="Эритроциты: " />
+					<p:inputText id="rbc" value="#{analysisBean.selectedAnalysis.rbc}"/>
+					
+					<h:outputLabel for="hgb" value="Гемоглобин: " />
+					<p:inputText id="hgb" value="#{analysisBean.selectedAnalysis.hgb}"/>
+				
+					<h:outputLabel for="esr" value="СОЭ: " />
+					<p:inputText id="esr" value="#{analysisBean.selectedAnalysis.esr}"/>
+					
+				</h:panelGrid>
+				<p:commandButton 
+							id="submitButton" 
+							icon="ui-icon-disk"
+							value="Сохранить" 
+							actionListener="#{analysisBean.saveAnalysis}" 
+							update="detail, growl, analysisTable" 
+							oncomplete="editDialog.hide();"/>
+			</p:dialog>
+		</h:form>
+	</h:body>
+</html>     

@@ -1,0 +1,209 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Карточки пациентов</title>
+		<style type="text/css">
+                        .ui-datatable table {
+                                width:100%;
+                        }
+                        .label {
+                                width:20%;
+                                padding:4px;
+                        }
+                        .value {
+                                width:80%;
+                                padding:4px;
+                        }
+                        .grid {
+                                width:100%;
+                        }
+                        .ui-widget, .ui-widget .ui-widget {
+                                font-size:12px !important;
+                        }
+                </style>
+	</h:head>
+	
+	<h:body>
+		<h:form id="form">
+			<h:inputHidden value = "#{patientBean.update}"/>
+			<p:growl id="growl" showDetail="true" />
+			<p:breadCrumb>  
+			    <p:menuitem value="Home" url="#" />  
+			    <p:menuitem value="Выйти из системы" url="/j_spring_security_logout" />  
+			</p:breadCrumb> 
+			
+            <p:panel header="Пользователь">  
+            	<h:panelGrid id="user" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="user_surname" value="Фамилия: " />
+					<p:inputText id="user_surname" value="#{patientBean.doctor.surname}" readonly="true"/>
+					
+					<h:outputLabel for="user_name" value="Имя: " />
+					<p:inputText id="user_name" value="#{patientBean.doctor.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_patronymic" value="Отчество: " />
+					<p:inputText id="user_patronymic" value="#{patientBean.doctor.patronymic}" readonly="true"/>
+					
+					<h:outputLabel for="user_specialty" value="Специальность: " />
+					<p:inputText id="user_specialty" value="#{patientBean.doctor.specialty.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_role" value="Должность: " />
+					<p:inputText id="user_role" value="#{patientBean.doctor.role_name}" readonly="true"/>
+					
+            	</h:panelGrid>
+            </p:panel>
+             
+            <p:panel header="Справочник пациентов">              
+			<p:dataTable id="patientTable" 
+						 var="patient" 
+						 value="#{patientBean.patients}" 
+						 widgetVar="patientsTable" 
+						 emptyMessage="В таблице нет записей с таких критерием поиска" 
+						 filteredValue="#{patientBean.filteredPatients}"
+						 rowKey="#{patient.id}"
+						 rows="6"
+						 selection="#{patientBean.selectedPatient}"  selectionMode="single">
+						 
+				<p:ajax event="rowSelect" update=":form:detail"/>
+				
+				<f:facet name="header">
+					<p:outputPanel>
+						<h:outputText value="Поиск по всем полям: " />
+						<p:inputText id="globalFilter" onkeyup="patientsTable.filter()" style="width:150px" />
+					</p:outputPanel>
+				</f:facet>
+	
+				<p:column id="surnameColumn" filterBy="#{patient.surname}"
+						  headerText="Фамилия">
+					<h:outputText value="#{patient.surname}" />
+				</p:column>
+				
+				<p:column id="nameColumn" filterBy="#{patient.name}" 
+						  headerText="Имя">
+					<h:outputText value="#{patient.name}" />
+				</p:column>
+				
+				<p:column id="patronymicColumn" filterBy="#{patient.patronymic}"
+						  headerText="Отчество">
+					<h:outputText value="#{patient.patronymic}" />
+				</p:column>
+	
+				<p:column id="sexColumn" filterBy="#{patient.sex}" 
+						  headerText="Пол" style="width:4%"
+						  filterOptions="#{patientBean.sexOptions}"
+						  filterMatchMode="exact">
+					<h:outputText value="#{patient.sex}" />
+				</p:column>        
+	
+				<p:column id="addressColumn"
+						  headerText="Адрес">
+					<h:outputText value="#{patient.address}" />
+				</p:column>
+
+				<p:column id="workColumn"
+						  headerText="Место работы">
+					<h:outputText value="#{patient.work}" />
+				</p:column>		
+				
+				<p:column id="phoneColumn"
+						  headerText="Телефон">
+					<h:outputText value="#{patient.phone}" />
+				</p:column>						
+				
+				<p:column style="width:4%">  
+					<p:commandButton 
+								id="selectButton"
+								icon="ui-icon-wrench" 
+								value="Изменить"
+								update=":form:detail" 
+								oncomplete="editDialog.show()">  
+						<f:setPropertyActionListener value="#{patient}" target="#{patientBean.selectedPatient}" />  
+					</p:commandButton>
+				</p:column>
+					
+				<p:column style="width:4%">
+					<p:commandButton 
+								id="go_button" 
+								icon="ui-icon-person"
+								value="Перейти" 
+								ajax="false" 
+								action = "/doctor/visits.xhtml"
+								actionListener="#{patientBean.setPatientIdToVisitBean}"/>
+				</p:column>				
+				
+				<f:facet name="footer">  
+					<p:commandButton 
+								id="save_button" 
+								icon="ui-icon-circle-plus" 
+								value="Создать" 
+								actionListener="#{patientBean.newPatient}" 
+								update=":form:detail" oncomplete="editDialog.show()"/>
+					<p:commandButton 
+								id="chart_button" 
+								icon="ui-icon-circle-plus" 
+								value="Статистика обращений пациентов"
+								update=":form:chart"
+								actionListener="#{patientBean.createCartesianModel}"
+								oncomplete="chartDialog.show()"/>
+				</f:facet>
+				  
+			</p:dataTable>
+			</p:panel>
+			
+			<p:dialog header="Статистика обращений пациентов" modal="true" widgetVar="chartDialog" resizable="false">
+				<h:panelGrid id="chart" columns="2" style="margin-bottom:10px">
+				<p:barChart id="barChart" 
+							value="#{patientBean.cartesianModel}" 
+							legendPosition="ne" 
+							style="height:300px"  
+            				stacked="true" 
+            				barMargin="50" 
+            				min="0" 
+            				max="10"/>	
+				</h:panelGrid>
+				<p:commandButton 
+							id="exitButton"
+							icon="ui-icon-power" 
+							value="Закрыть" 
+							oncomplete="chartDialog.hide();"/>
+			</p:dialog>
+			
+			<p:dialog header="Введите данные" modal="true" widgetVar="editDialog" resizable="false">
+				<h:panelGrid id="detail" columns="2" style="margin-bottom:10px">
+					
+					<h:outputLabel for="surname" value="Фамилия: " />
+					<p:inputText id="surname" value="#{patientBean.selectedPatient.surname}"/>
+					
+					<h:outputLabel for="name" value="Имя: " />
+					<p:inputText id="name" value="#{patientBean.selectedPatient.name}"/>
+					
+					<h:outputLabel for="patronymic" value="Отчество: " />
+					<p:inputText id="patronymic" value="#{patientBean.selectedPatient.patronymic}"/>
+				
+					<h:outputLabel for="sex" value="Пол: " />
+					<p:inputText id="sex" value="#{patientBean.selectedPatient.sex}"/>
+					
+					<h:outputLabel for="address" value="Адрес: " />
+					<p:inputText id="address" value="#{patientBean.selectedPatient.address}"/>
+					
+					<h:outputLabel for="work" value="Место работы: " />
+					<p:inputText id="work" value="#{patientBean.selectedPatient.work}"/>
+					
+					<h:outputLabel for="phone" value="Телефон: " />
+					<p:inputText id="phone" value="#{patientBean.selectedPatient.phone}"/>
+																								
+				</h:panelGrid>
+				<p:commandButton 
+							id="submitButton"
+							icon="ui-icon-disk" 
+							value="Сохранить" 
+							actionListener="#{patientBean.savePatient}" 
+							update="detail, growl, patientTable" 
+							oncomplete="editDialog.hide();"/>
+			</p:dialog>
+		</h:form>
+	</h:body>
+</html>     

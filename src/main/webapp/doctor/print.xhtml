@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Печать больничного</title>
+	</h:head>
+	<h:body>
+		<h:form>
+			<div style = "width: 400px">
+				<h3 align="center" >Листок нетрудоспособности</h3>
+				<h:panelGrid id="detail" columns="2" style="margin-bottom:10px; width: 450px" > 
+					
+					<h:outputLabel value="Выдан: "/> 
+					<h:outputLabel value="#{visitBean.selectedVisit.date}"/> 
+					
+					<h:outputLabel value="Пациент :"/>
+					<h:outputLabel value="#{visitBean.selectedVisit.patient.surname} #{visitBean.selectedVisit.patient.name} #{visitBean.selectedVisit.patient.patronymic}"/> 
+					
+					<h:outputLabel value="Место работы :"/>
+					<h:outputLabel value="#{visitBean.selectedVisit.patient.work}"/> 
+					
+					<h:outputLabel value="Освобождение от работы:"/>
+					<h:outputLabel value=""/>
+				
+					<h:outputLabel value="c #{visitBean.selectedVisit.date}"/> 
+					<h:outputLabel value="по #{visitBean.selectedVisit.closed_date}"/>
+					
+					<h:outputLabel value="Лечащий врач :"/>
+					<h:outputLabel value="#{visitBean.selectedVisit.doctor.surname} #{visitBean.selectedVisit.doctor.name} #{visitBean.selectedVisit.doctor.patronymic}"/> 
+					
+					<h:outputLabel value="Специальность :"/>
+					<h:outputLabel value="#{visitBean.selectedVisit.doctor.specialty.name}"/>
+					
+					<h:outputLabel value="Подпись :"/>
+					<h:outputLabel value="___________________"/>
+				
+				</h:panelGrid>            
+			</div>        
+		</h:form>
+	</h:body>
+</html>     

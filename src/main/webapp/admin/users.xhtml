@@ -1,0 +1,170 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Справочник пользователей</title>
+		<style type="text/css">
+                        .ui-datatable table {
+                                width:100%;
+                        }
+                        .label {
+                                width:20%;
+                                padding:4px;
+                        }
+                        .value {
+                                width:80%;
+                                padding:4px;
+                        }
+                        .grid {
+                                width:100%;
+                        }
+                        .ui-widget, .ui-widget .ui-widget {
+                                font-size:12px !important;
+                        }
+                </style>
+	</h:head>
+	<h:body>
+		<h:form id="form">
+			<p:growl id="growl" showDetail="true" />
+			<p:breadCrumb>  
+			    <p:menuitem value="Home" url="#" />  
+			    <p:menuitem value="Выйти из системы" url="/j_spring_security_logout" />  
+			</p:breadCrumb> 
+			
+            <p:panel header="Пользователь">  
+            	<h:panelGrid id="user" columns="2" style="margin-bottom:10px">
+					
+					<h:outputLabel for="user_surname" value="Фамилия: " />
+					<p:inputText id="user_surname" value="#{userBean.doctor.surname}" readonly="true"/>
+					
+					<h:outputLabel for="user_name" value="Имя: " />
+					<p:inputText id="user_name" value="#{userBean.doctor.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_patronymic" value="Отчество: " />
+					<p:inputText id="user_patronymic" value="#{userBean.doctor.patronymic}" readonly="true"/>
+					
+					<h:outputLabel for="user_specialty" value="Специальность: " />
+					<p:inputText id="user_specialty" value="#{userBean.doctor.specialty.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_role" value="Должность: " />
+					<p:inputText id="user_role" value="#{userBean.doctor.role_name}" readonly="true"/>
+					
+            	</h:panelGrid>
+            </p:panel>
+             
+            <p:panel header="Справочник пользователей">              
+			<p:dataTable id="doctorTable" 
+						 var="doctor" 
+						 value="#{userBean.doctors}" 
+						 widgetVar="doctorsTable" 
+						 emptyMessage="В таблице нет записей с таких критерием поиска" 
+						 filteredValue="#{userBean.filteredDoctors}"
+						 rowKey="#{doctor.id}"
+						 rows="6"
+						 selection="#{userBean.selectedDoctor}" selectionMode="single">
+						 
+				<p:ajax event="rowSelect" update=":form:detail" listener="#{userBean.updateDoctorSpecialty}"/>
+				
+				<f:facet name="header">
+					<p:outputPanel>
+						<h:outputText value="Поиск по всем полям: " />
+						<p:inputText id="globalFilter" onkeyup="doctorsTable.filter()" style="width:150px" />
+					</p:outputPanel>
+				</f:facet>
+	
+				<p:column id="surnameColumn" filterBy="#{doctor.surname}"
+						  headerText="Фамилия">
+					<h:outputText value="#{doctor.surname}" />
+				</p:column>
+				
+				<p:column id="nameColumn" filterBy="#{doctor.name}" 
+						  headerText="Имя">
+					<h:outputText value="#{doctor.name}" />
+				</p:column>
+	
+				<p:column id="patronymicColumn" filterBy="#{doctor.patronymic}"
+						  headerText="Отчество">
+					<h:outputText value="#{doctor.patronymic}" />
+				</p:column>
+	
+				<p:column id="roleColumn"
+						  headerText="Права доступа">
+					<h:outputText value="#{doctor.role_name}" />
+				</p:column>        
+	
+				<p:column id="loginColumn"
+						  headerText="Логин">
+					<h:outputText value="#{doctor.login}" />
+				</p:column>
+
+				<p:column id="passwordColumn"
+						  headerText="Пароль">
+					<h:outputText value="#{doctor.password}" />
+				</p:column>		
+				
+				<p:column style="width:4%">  
+					<p:commandButton 
+								id="selectButton" 
+								icon="ui-icon-wrench"
+								value="Изменить"
+								update=":form:detail" 
+								oncomplete="editDialog.show()">  
+						<f:setPropertyActionListener value="#{doctor}" target="#{userBean.selectedDoctor}" />  
+					</p:commandButton>  
+				</p:column>				
+				
+				<f:facet name="footer">  
+					<p:commandButton 
+								id="save_button"
+								icon="ui-icon-circle-plus"
+								value="Создать" 
+								actionListener="#{userBean.newDoctor}" 
+								update=":form:detail" 
+								oncomplete="editDialog.show()"/>  
+				</f:facet>
+				  
+			</p:dataTable>
+			</p:panel>
+	     
+			<p:dialog header="Введите данные" modal="true" widgetVar="editDialog" resizable="false">
+				<h:panelGrid id="detail" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="surname" value="Фамилия: " />
+					<p:inputText id="surname" value="#{userBean.selectedDoctor.surname}"/>
+				
+					<h:outputLabel for="name" value="Имя: " />
+					<p:inputText id="name" value="#{userBean.selectedDoctor.name}"/>
+					
+					<h:outputLabel for="patronymic" value="Отчество: " />
+					<p:inputText id="patronymic" value="#{userBean.selectedDoctor.patronymic}"/>
+					
+					<h:outputLabel for="specialty" value="Специальность: " />
+					<h:selectOneMenu id="specialty" value="#{userBean.doctor_specialty_id}" required="true">  
+						<f:selectItems value="#{userBean.specialtyOptions}" />  
+					</h:selectOneMenu>
+					
+					<h:outputLabel for="login" value="Логин: " />
+					<p:inputText id="login" value="#{userBean.selectedDoctor.login}"/>
+					
+					<h:outputLabel for="password" value="Пароль: " />
+					<p:inputText id="password" value="#{userBean.selectedDoctor.password}"/>
+					
+					<h:outputLabel for="role" value="Права доступа: " />
+					<h:selectOneMenu id="role" value="#{userBean.selectedDoctor.role}" required="true">  
+						<f:selectItems value="#{userBean.roleOptions}" />  
+					</h:selectOneMenu>  
+					
+				</h:panelGrid>
+				<p:commandButton 
+							id="submitButton" 
+							icon="ui-icon-disk" 
+							value="Сохранить" 
+							actionListener="#{userBean.saveDoctor}" 
+							update="detail, growl, doctorTable" 
+							oncomplete="editDialog.hide();"/>
+			</p:dialog>
+		</h:form>
+	</h:body>
+</html>     

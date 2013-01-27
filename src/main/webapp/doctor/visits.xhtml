@@ -1,0 +1,196 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Справочник посещений</title>
+		<style type="text/css">
+                        .ui-datatable table {
+                                width:100%;
+                        }
+                        .label {
+                                width:20%;
+                                padding:4px;
+                        }
+                        .value {
+                                width:80%;
+                                padding:4px;
+                        }
+                        .grid {
+                                width:100%;
+                        }
+                        .ui-widget, .ui-widget .ui-widget {
+                                font-size:12px !important;
+                        }
+                </style>
+	</h:head>
+	<h:body> 
+		<h:form id="form">
+			<h:inputHidden value = "#{visitBean.update}"/>
+			
+			<p:growl id="growl" showDetail="true" />
+			<p:breadCrumb>  
+			    <p:menuitem value="Home" url="#" />  
+			    <p:menuitem value="Справочник пациентов" url="/faces/doctor/patients.xhtml" />
+			    <p:menuitem value="Выйти из системы" url="/j_spring_security_logout" />  
+			</p:breadCrumb> 
+			
+			<h:panelGrid columns="2" style="margin-bottom:10px">
+            <p:panel header="Прием ведет">  
+            	<h:panelGrid id="user" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="user_surname" value="Фамилия: " />
+					<p:inputText id="user_surname" value="#{visitBean.doctor.surname}" readonly="true"/>
+					
+					<h:outputLabel for="user_name" value="Имя: " />
+					<p:inputText id="user_name" value="#{visitBean.doctor.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_patronymic" value="Отчество: " />
+					<p:inputText id="user_patronymic" value="#{visitBean.doctor.patronymic}" readonly="true"/>
+					
+					<h:outputLabel for="user_specialty" value="Специальность: " />
+					<p:inputText id="user_specialty" value="#{visitBean.doctor.specialty.name}" readonly="true"/>
+					
+					<h:outputLabel for="user_role" value="Должность: " />
+					<p:inputText id="user_role" value="#{visitBean.doctor.role_name}" readonly="true"/>
+					
+            	</h:panelGrid>
+            </p:panel>
+            <p:panel header="Пациент">  
+            	<h:panelGrid id="pat" columns="2" style="margin-bottom:10px">
+				
+					<h:outputLabel for="patient_surname" value="Фамилия: " />
+					<p:inputText id="patient_surname" value="#{visitBean.patient.surname}" readonly="true"/>
+					
+					<h:outputLabel for="patient_name" value="Имя: " />
+					<p:inputText id="patient_name" value="#{visitBean.patient.name}" readonly="true"/>
+					
+					<h:outputLabel for="patient_patronymic" value="Отчество: " />
+					<p:inputText id="patient_patronymic" value="#{visitBean.patient.patronymic}" readonly="true"/>
+					
+					<h:outputLabel for="patient_sex" value="Пол: " />
+					<p:inputText id="patient_sex" value="#{visitBean.patient.sex}" readonly="true"/>
+					
+					<h:outputLabel for="patient_address" value="Адрес: " />
+					<p:inputText id="patient_address" value="#{visitBean.patient.address}" readonly="true"/>
+					
+            	</h:panelGrid>
+            </p:panel>
+            </h:panelGrid>
+             
+            <p:panel header="Справочник посещений">              
+			<p:dataTable id="visitTable" 
+						 var="visit" 
+						 value="#{visitBean.visits}" 
+						 widgetVar="visitsTable" 
+						 emptyMessage="В таблице нет записей с таких критерием поиска" 
+						 filteredValue="#{visitBean.filteredVisits}"
+						 rowKey="#{visit.id}"
+						 rows="6"
+						 selection="#{visitBean.selectedVisit}"  selectionMode="single">
+						 
+				<p:ajax event="rowSelect" update=":form:detail"/>
+	
+				<p:column id="dateColumn" filterBy="#{visit.date}"
+						  headerText="Поиск по дате приема">
+					<h:outputText value="#{visit.date}" />
+				</p:column>
+				
+				<p:column style="width:4%">  
+					<p:commandButton 
+								id="selectButton" 
+								icon="ui-icon-wrench"
+								value="Изменить"
+								update=":form:detail" 
+								oncomplete="editDialog.show()">  
+						<f:setPropertyActionListener value="#{visit}" target="#{visitBean.selectedVisit}" />  
+					</p:commandButton>  
+				</p:column>				
+				
+				<f:facet name="footer">  
+					<p:commandButton 
+							id="save_button" 
+							icon="ui-icon-circle-plus"  
+							value="Создать" 
+							actionListener="#{visitBean.newVisit}" 
+							update=":form:detail" 
+							oncomplete="editDialog.show()"/>  
+				</f:facet>
+				  
+			</p:dataTable>
+			</p:panel>
+	     
+			<p:dialog header="Введите данные" modal="true" widgetVar="editDialog" resizable="false">
+			
+				<h:panelGrid id="detail" columns="2" style="margin-bottom:10px">
+					<h:outputText value="Дата приема: #{visitBean.selectedVisit.date}" />
+					<h:outputText value="Врач: #{visitBean.selectedVisit.doctor.surname}" />
+					
+					<p:panel header="Диагноз">      
+						<p:inputTextarea id="diagnosis" rows="5" cols="30" autoResize="false" value="#{visitBean.selectedVisit.diagnosis}"/>
+					</p:panel>
+					
+					<p:panel header="Жалобы">      
+						<p:inputTextarea id="complaints" rows="5" cols="30" autoResize="false" value="#{visitBean.selectedVisit.complaints}"/>
+					</p:panel>
+					
+					<p:panel header="Статус">      
+						<p:inputTextarea id="status" rows="5" cols="30" autoResize="false" value="#{visitBean.selectedVisit.status}"/>
+					</p:panel>
+					
+					<p:panel header="Лечение">      
+						<p:inputTextarea id="treatment" rows="5" cols="30" autoResize="false" value="#{visitBean.selectedVisit.treatment}"/>
+					</p:panel>
+					
+					<p:panel header="Анализ крови">      
+						<h:panelGrid id="boold_detail" columns="2" style="margin-bottom:10px">
+							
+							<h:outputLabel value="Лейкоциты:   " />
+							<h:outputLabel value="#{visitBean.selectedVisit.analysis.wbc}" />
+							
+							<h:outputLabel value="Эритроциты:   " />
+							<h:outputLabel value="#{visitBean.selectedVisit.analysis.rbc}" />
+							
+							<h:outputLabel value="Гемоглобин:   " />
+							<h:outputLabel value="#{visitBean.selectedVisit.analysis.hgb}" />
+							
+							<h:outputLabel value="СОЭ:   " />
+							<h:outputLabel value="#{visitBean.selectedVisit.analysis.esr}" />
+						
+						</h:panelGrid>
+					</p:panel>
+					
+				</h:panelGrid>
+				<p:commandButton 
+							id="saveButton" 
+							value="Сохранить" 
+							icon="ui-icon-disk" 
+							actionListener="#{visitBean.saveVisit}" 
+							update="detail, growl, visitTable" 
+							oncomplete="editDialog.hide();"/>
+				<p:commandButton 
+							id="sendButton" 
+							value="Направить на анализ" 
+							icon="ui-icon-circle-arrow-e" 
+							actionListener="#{visitBean.sendToAnalysis}" 
+							update="growl"/>
+				<p:commandButton 
+							id="closeButton" 
+							value="Закрыть больничный" 
+							icon="ui-icon-locked" 
+							actionListener="#{visitBean.closeVisit}" 
+							update="detail, growl" 
+							oncomplete="editDialog.hide();"/>
+				<p:commandButton 
+							id="printButton" 
+							value="Распечатать" 
+							icon="ui-icon-print" 
+							onclick="this.form.target='_blank'"
+							ajax="false" 
+							action = "/doctor/print.xhtml"
+							oncomplete="editDialog.hide();"/>
+			</p:dialog>
+		</h:form>
+	</h:body>
+</html>     

@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Карточки пациентов</title>
+		<style type="text/css">
+                        .ui-datatable table {
+                                width:95%;
+                        }
+                        .label {
+                                width:20%;
+                                padding:4px;
+                        }
+                        .value {
+                                width:80%;
+                                padding:4px;
+                        }
+                        .grid {
+                                width:100%;
+                        }
+                        .ui-widget, .ui-widget .ui-widget {
+                                font-size:12px !important;
+                        }
+                        #container {
+                        		width: 300px; 
+                        		position:absolute; 
+                        		left: 50%; top: 50%; 
+                        		margin-left: -150px; 
+                        		margin-top: -100px;
+                        }
+                </style>
+	
+	</h:head>
+	<h:body>
+		<h:form id="form">
+			<div id = "container">
+				<p:growl id="growl" showDetail="true" />
+				<p:panel header="Авторизация">  
+					<h:panelGrid columns="2" cellpadding="5">  
+			            <h:outputLabel for="username" value="Пользователь:" />  
+			            <p:inputText value="#{loginBean.login}"   
+			                    id="username" required="true" label="username" />  
+			              
+			            <h:outputLabel for="password" value="Пароль:" />  
+			            <p:password value="#{loginBean.password}"   
+			                    id="password" required="true" label="password" />  
+			              
+			            <f:facet name="footer">  
+			                <p:commandButton 
+			                			id="loginButton" 
+			                			icon="ui-icon-unlocked" 
+			                			value="Войти" 
+			                			update="growl"   
+			                    		action="#{loginBean.login}" />  
+			            </f:facet>  
+		        	</h:panelGrid>
+	        	</p:panel>
+			</div>	
+		</h:form>
+	</h:body>
+</html>     
