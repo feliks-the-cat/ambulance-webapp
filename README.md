@@ -9,10 +9,10 @@ Automation of medical establishment
 + accounting of sicknesses
 
 Used technologies:
-+ Spring (Core, Security)
-+ Hibernate
-+ Tomcat 7.0.x
-+ JSF 2.x
-+ UI: Primefaces
++ Spring 3.1.0 (Core, Security)
++ Hibernate 3.6
++ Tomcat 7.0.3
++ JSF 2
++ UI: Primefaces 3.4.2
 + PostgreSQL 9.x
 + Maven
