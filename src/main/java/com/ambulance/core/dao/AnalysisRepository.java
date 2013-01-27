@@ -12,7 +12,7 @@ import com.ambulance.core.domain.Visit;
 @Repository("analysisRepository")
 public class AnalysisRepository extends GenericDAOImpl<Analysis>{
 
-	public AnalysisRepository() {
+	public AnalysisRepository() {   
 		super(Analysis.class);
 	}
 	
