@@ -15,4 +15,5 @@ Used technologies:
 + JSF 2
 + UI: Primefaces 3.4.2
 + PostgreSQL 9.x
++ Eclipse Juno
 + Maven
